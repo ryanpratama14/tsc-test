@@ -3,19 +3,20 @@ import Navbar from "./components/Navbar";
 import { Icon } from "@iconify/react";
 import { Toaster, toast } from "react-hot-toast";
 import bg from "./assets/bg.jpeg";
+import { motion } from "framer-motion";
 
 interface BookData {
   pages: PageData[];
 }
 
 interface PageData {
-  images: File[];
+  images: any[];
   bg: any;
 }
 
 interface ToggleItems {
   id: number;
-  files: { file?: File | string }[];
+  files: any[];
   label: string;
 }
 
@@ -48,11 +49,7 @@ const App = (): JSX.Element => {
     },
     {
       id: 2,
-      files: [
-        {
-          file: bg,
-        },
-      ],
+      files: [bg],
       label: "Фон",
     },
   ]);
@@ -74,7 +71,7 @@ const App = (): JSX.Element => {
     currentPage?.images?.push(
       e?.dataTransfer?.files[0]
         ? e?.dataTransfer?.files[0]
-        : toggleData[selectedToggle]?.files[selectedImage]?.file
+        : toggleData[selectedToggle]?.files[selectedImage]
     );
     setData({
       ...data,
@@ -103,7 +100,7 @@ const App = (): JSX.Element => {
   const handleChange = (e: any) => {
     if (e?.target?.files[0]) {
       const newData = [...toggleData];
-      newData[selectedToggle]?.files?.unshift({ file: e?.target?.files[0] });
+      newData[selectedToggle]?.files?.unshift(e?.target?.files[0]);
       toast.success("Фото добавлено");
       setToggleData(newData);
     }
@@ -119,12 +116,13 @@ const App = (): JSX.Element => {
     } else {
       const newPages = [...data?.pages];
       const currentPage = newPages[selected];
-      console.log(currentPage);
       const selectedFile = toggleData[selectedToggle]?.files[index];
       if (selectedToggle === 2) {
-        currentPage.bg = selectedFile?.file;
+        currentPage.bg = selectedFile;
+        toast.success("Фон добавлен");
       } else if (selectedToggle === 0 || selectedToggle === 1) {
-        currentPage.images.push(selectedFile?.file);
+        currentPage?.images?.push(selectedFile);
+        toast.success("Изображение добавлен");
       }
       setData({
         ...data,
@@ -132,8 +130,6 @@ const App = (): JSX.Element => {
       });
     }
   };
-
-  console.log(data);
 
   const handleDeleteImages = () => {
     if (selectedImages?.length) {
@@ -153,8 +149,6 @@ const App = (): JSX.Element => {
     !toggleData[selectedToggle]?.files?.length && setIsEdit(false);
   }, [toggleData[selectedToggle]?.files?.length]);
 
-  console.log(data?.pages[selected]?.bg);
-
   return (
     <main className="lg:px-longer10 xl:px-longer-12 2xl:px-longer14 px-normal py-shorter2">
       <Toaster />
@@ -167,22 +161,39 @@ const App = (): JSX.Element => {
             </span>
           </section>
           <section className="p-shorter2 lg:p-shorter4 bg-grayCustom">
+            {/* <motion.div
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: false, amount: 1 }}
+              transition={{ delay: 0.3, duration: 0.4 }}
+              variants={{
+                hidden: { opacity: 0, x: -50 },
+                visible: { opacity: 1, x: 0 },
+              }}
+            > */}
             <div
               onDragStart={(e) => dragStartHandler(e)}
               onDragLeave={(e) => dragLeaveHandler(e)}
               onDragOver={(e) => dragStartHandler(e)}
               onDrop={(e) => onDropHandler(e)}
               className={`${drag ? "bg-gray-300" : "bg-white border-[2px]"} 
-              ${data?.pages[selected]?.images?.length && "py-normal"}
-              w-full aspect-[4/3] flex-col gap-12 flex justify-center items-center border-gray-300 transition-all`}
+              w-full aspect-[4/3] relative flex justify-center items-center border-gray-300 transition-all`}
             >
               {data?.pages[selected]?.images?.length ? (
                 data?.pages[selected]?.images?.map((e: any, i: number) => {
                   return (
-                    <img
+                    <motion.img
+                      initial="hidden"
+                      whileInView="visible"
+                      viewport={{ once: false, amount: 1 }}
+                      transition={{ delay: 0.3, duration: 0.4 }}
+                      variants={{
+                        hidden: { opacity: 0, y: -50 },
+                        visible: { opacity: 1, y: 0 },
+                      }}
                       key={i}
                       src={URL.createObjectURL(e)}
-                      className="z-20 rounded-md w-[50%] aspect-square"
+                      className="absolute z-20 rounded-md w-[50%] aspect-square"
                     />
                   );
                 })
@@ -191,7 +202,7 @@ const App = (): JSX.Element => {
               )}
               {data?.pages[selected]?.bg && (
                 <img
-                  className="z-10 object-cover w-full h-full"
+                  className="z-10 absolute object-cover w-full h-full"
                   src={
                     data?.pages[selected]?.bg?.name
                       ? URL.createObjectURL(data?.pages[selected]?.bg)
@@ -200,6 +211,7 @@ const App = (): JSX.Element => {
                 />
               )}
             </div>
+            {/* </motion.div> */}
             <section className="flex gap-4 items-center justify-center mt-shorter2 lg:mt-shorter4">
               <button
                 onClick={() => {
@@ -214,9 +226,11 @@ const App = (): JSX.Element => {
               <label className="p text-blueCustom">
                 Страница: {selected + 1}
               </label>
-              <button className="w-12 aspect-square text-black bg-gray-300 flex justify-center items-center rounded-full">
+              <button
+                onClick={() => setSelectedAndAddPage(selected + 1)}
+                className="w-12 aspect-square text-black bg-gray-300 flex justify-center items-center rounded-full"
+              >
                 <Icon
-                  onClick={() => setSelectedAndAddPage(selected + 1)}
                   icon="material-symbols:arrow-back-ios-new"
                   width={20}
                   rotate={2}
@@ -277,7 +291,7 @@ const App = (): JSX.Element => {
                 </button>
               </div>
             </div>
-            <section className="lg:px-shorter4 px-shorter2 pb-shorter2 lg:pb-shorter4 gap-6 grid grid-cols-2 md:grid-cols-3">
+            <section className="lg:px-shorter4 px-shorter2 pb-shorter2 lg:pb-shorter4 gap-4 grid grid-cols-2 md:grid-cols-3">
               <div
                 className={`relative aspect-square flex justify-center items-center text-center border-dotted border-[2px] border-black rounded-md  ${
                   isEdit ? "cursor-not-allowed" : "cursor-pointer"
@@ -300,22 +314,20 @@ const App = (): JSX.Element => {
                   return (
                     <div
                       key={i}
+                      draggable={selectedToggle !== 2 ? true : false}
                       onDragStart={() => {
                         setSelectedImage(i);
                       }}
                       onClick={() => {
                         handleImageClick(i);
                       }}
-                      className={`cursor-pointer relative transition-all aspect-square ${
+                      className={`relative transition-all aspect-square cursor-pointer ${
                         selectedImages.includes(i) && "scale-95"
                       }`}
                     >
                       <img
-                        draggable
-                        src={
-                          e?.file?.name ? URL.createObjectURL(e?.file) : e?.file
-                        }
-                        className="z-20 absolute object-cover rounded-md w-full aspect-square"
+                        src={e?.name ? URL.createObjectURL(e) : e}
+                        className="absolute object-cover rounded-md w-full aspect-square"
                       />
                       <div
                         className={`flex justify-center items-center absolute w-full aspect-square bg-gray-200 rounded-md
