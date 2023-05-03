@@ -34,11 +34,7 @@ const ImageModal = ({ show, onClose, data }: any) => {
                 >
                   X
                 </button>
-                {data?.length ? (
-                  <img src={URL.createObjectURL(data[0]?.images[0]?.file)} />
-                ) : (
-                  <></>
-                )}
+                <img src={data?.name ? URL.createObjectURL(data) : data} />
               </div>
             </Transition.Child>
           </div>

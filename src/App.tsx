@@ -3,7 +3,8 @@ import Navbar from "./components/Navbar";
 import { Icon } from "@iconify/react";
 import { Toaster, toast } from "react-hot-toast";
 import bg from "./assets/bg.jpeg";
-import { motion } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
+import ImageModal from "./components/ImageModal";
 
 interface BookData {
   pages: PageData[];
@@ -27,6 +28,7 @@ const App = (): JSX.Element => {
   const [isEdit, setIsEdit] = useState<boolean>(false);
   const [selectedImages, setSelectedImages] = useState<number[]>([]);
   const [selectedImage, setSelectedImage] = useState<number>(0);
+  const [selectedImageModal, setSelectedImageModal] = useState<number>(0);
   const [data, setData] = useState<BookData>({
     pages: [
       {
@@ -149,9 +151,19 @@ const App = (): JSX.Element => {
     !toggleData[selectedToggle]?.files?.length && setIsEdit(false);
   }, [toggleData[selectedToggle]?.files?.length]);
 
+  const [show, setShow] = useState<boolean>(false);
+  function onClose() {
+    setShow(false);
+  }
+
   return (
     <main className="lg:px-longer10 xl:px-longer-12 2xl:px-longer14 px-normal py-shorter2">
       <Toaster />
+      <ImageModal
+        show={show}
+        onClose={onClose}
+        data={data?.pages[selected]?.images[selectedImageModal]}
+      />
       <div className="p-shorter2 lg:p-shorter4 bg-grayCustom">
         <div className="border-[2px] border-gray-300">
           <Navbar />
@@ -161,56 +173,48 @@ const App = (): JSX.Element => {
             </span>
           </section>
           <section className="p-shorter2 lg:p-shorter4 bg-grayCustom">
-            {/* <motion.div
-              initial="hidden"
-              whileInView="visible"
-              viewport={{ once: false, amount: 1 }}
-              transition={{ delay: 0.3, duration: 0.4 }}
-              variants={{
-                hidden: { opacity: 0, x: -50 },
-                visible: { opacity: 1, x: 0 },
-              }}
-            > */}
-            <div
-              onDragStart={(e) => dragStartHandler(e)}
-              onDragLeave={(e) => dragLeaveHandler(e)}
-              onDragOver={(e) => dragStartHandler(e)}
-              onDrop={(e) => onDropHandler(e)}
-              className={`${drag ? "bg-gray-300" : "bg-white border-[2px]"} 
-              w-full aspect-[4/3] relative flex justify-center items-center border-gray-300 transition-all`}
-            >
-              {data?.pages[selected]?.images?.length ? (
-                data?.pages[selected]?.images?.map((e: any, i: number) => {
+            <AnimatePresence>
+              <div
+                onDragStart={(e) => dragStartHandler(e)}
+                onDragLeave={(e) => dragLeaveHandler(e)}
+                onDragOver={(e) => dragStartHandler(e)}
+                onDrop={(e) => onDropHandler(e)}
+                className={`${drag ? "bg-gray-300" : "bg-white border-[2px]"} 
+              w-full aspect-[4/3] flex-col flex justify-center items-center border-gray-300 transition-all`}
+              >
+                {data?.pages[selected]?.bg ? (
+                  <motion.img
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    src={
+                      data?.pages[selected]?.bg?.name
+                        ? URL.createObjectURL(data?.pages[selected]?.bg)
+                        : data?.pages[selected]?.bg
+                    }
+                    className="object-cover  w-full h-full"
+                  />
+                ) : (
+                  <></>
+                )}
+                {data?.pages[selected]?.images?.map((e: any, i: number) => {
                   return (
                     <motion.img
-                      initial="hidden"
-                      whileInView="visible"
-                      viewport={{ once: false, amount: 1 }}
-                      transition={{ delay: 0.3, duration: 0.4 }}
-                      variants={{
-                        hidden: { opacity: 0, y: -50 },
-                        visible: { opacity: 1, y: 0 },
+                      onClick={() => {
+                        setShow(true);
+                        setSelectedImageModal(i);
                       }}
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      exit={{ opacity: 0 }}
                       key={i}
                       src={URL.createObjectURL(e)}
-                      className="absolute z-20 rounded-md w-[50%] aspect-square"
+                      className=" z-20 cursor-pointer rounded-md w-[50%] aspect-square"
                     />
                   );
-                })
-              ) : (
-                <></>
-              )}
-              {data?.pages[selected]?.bg && (
-                <img
-                  className="z-10 absolute object-cover w-full h-full"
-                  src={
-                    data?.pages[selected]?.bg?.name
-                      ? URL.createObjectURL(data?.pages[selected]?.bg)
-                      : data?.pages[selected]?.bg
-                  }
-                />
-              )}
-            </div>
+                })}
+              </div>
+            </AnimatePresence>
             {/* </motion.div> */}
             <section className="flex gap-4 items-center justify-center mt-shorter2 lg:mt-shorter4">
               <button
