@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import Navbar from "./components/Navbar";
 import { Icon } from "@iconify/react";
 import { Toaster, toast } from "react-hot-toast";
@@ -28,7 +28,6 @@ const App = (): JSX.Element => {
   const [isEdit, setIsEdit] = useState<boolean>(false);
   const [selectedImages, setSelectedImages] = useState<number[]>([]);
   const [selectedImage, setSelectedImage] = useState<number>(0);
-  const [selectedImageModal, setSelectedImageModal] = useState<number>(0);
   const [data, setData] = useState<BookData>({
     pages: [
       {
@@ -155,14 +154,17 @@ const App = (): JSX.Element => {
   function onClose() {
     setShow(false);
   }
-
   return (
     <main className="lg:px-longer10 xl:px-longer-12 2xl:px-longer14 px-normal py-shorter2">
       <Toaster />
       <ImageModal
         show={show}
         onClose={onClose}
-        data={data?.pages[selected]?.images[selectedImageModal]}
+        data={
+          data?.pages[selected]?.images[
+            data?.pages[selected]?.images?.length - 1
+          ]
+        }
       />
       <div className="p-shorter2 lg:p-shorter4 bg-grayCustom">
         <div className="border-[2px] border-gray-300">
@@ -180,7 +182,7 @@ const App = (): JSX.Element => {
                 onDragOver={(e) => dragStartHandler(e)}
                 onDrop={(e) => onDropHandler(e)}
                 className={`${drag ? "bg-gray-300" : "bg-white border-[2px]"} 
-              w-full aspect-[4/3] flex-col flex justify-center items-center border-gray-300 transition-all`}
+              w-full aspect-[4/3] relative flex justify-center items-center border-gray-300 transition-all`}
               >
                 {data?.pages[selected]?.bg ? (
                   <motion.img
@@ -192,7 +194,7 @@ const App = (): JSX.Element => {
                         ? URL.createObjectURL(data?.pages[selected]?.bg)
                         : data?.pages[selected]?.bg
                     }
-                    className="object-cover  w-full h-full"
+                    className="object-cover absolute w-full h-full"
                   />
                 ) : (
                   <></>
@@ -200,16 +202,13 @@ const App = (): JSX.Element => {
                 {data?.pages[selected]?.images?.map((e: any, i: number) => {
                   return (
                     <motion.img
-                      onClick={() => {
-                        setShow(true);
-                        setSelectedImageModal(i);
-                      }}
+                      onClick={() => setShow(true)}
                       initial={{ opacity: 0 }}
                       animate={{ opacity: 1 }}
                       exit={{ opacity: 0 }}
                       key={i}
                       src={URL.createObjectURL(e)}
-                      className="object-cover z-20 cursor-pointer rounded-md w-[50%] aspect-square"
+                      className="object-cover absolute z-20 cursor-pointer rounded-md w-[50%] aspect-square"
                     />
                   );
                 })}
@@ -335,12 +334,12 @@ const App = (): JSX.Element => {
                       />
                       <div
                         className={`flex justify-center items-center absolute w-full aspect-square bg-gray-200 rounded-md
-                        ${
-                          selectedImages.includes(i)
-                            ? "opacity-50"
-                            : "opacity-0"
-                        }
-                        `}
+                          ${
+                            selectedImages.includes(i)
+                              ? "opacity-50"
+                              : "opacity-0"
+                          }
+                          `}
                       >
                         <Icon icon="material-symbols:check" width={35} />
                       </div>
