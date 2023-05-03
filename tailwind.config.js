@@ -1,0 +1,47 @@
+/** @type {import('tailwindcss').Config} */
+export default {
+  content: ["./index.html", "./src/**/*.{js,ts,jsx,tsx}"],
+  theme: {
+    extend: {
+      colors: {
+        grayCustom: "#F3F4F4",
+        blueCustom: "#283D70",
+      },
+      padding: {
+        shorter4: "1vw",
+        shorter3: "2vw",
+        shorter2: "3vw",
+        shorter: "4vw",
+        normal: "6vw",
+        longer: "8vw",
+        longer2: "10vw",
+        longer3: "12vw",
+        longer4: "14vw",
+        longer5: "16vw",
+        longer6: "18vw",
+        longer7: "20vw",
+        longer8: "22vw",
+        longer9: "24vw",
+        longer10: "26vw",
+      },
+      margin: {
+        shorter4: "1vw",
+        shorter3: "2vw",
+        shorter2: "3vw",
+        shorter: "4vw",
+        normal: "6vw",
+        longer: "8vw",
+        longer2: "10vw",
+        longer3: "12vw",
+        longer4: "14vw",
+        longer5: "16vw",
+        longer6: "18vw",
+        longer7: "20vw",
+        longer8: "22vw",
+        longer9: "24vw",
+        longer10: "26vw",
+      },
+    },
+  },
+  plugins: [],
+};
