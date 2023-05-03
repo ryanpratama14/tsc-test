@@ -209,7 +209,7 @@ const App = (): JSX.Element => {
                       exit={{ opacity: 0 }}
                       key={i}
                       src={URL.createObjectURL(e)}
-                      className=" z-20 cursor-pointer rounded-md w-[50%] aspect-square"
+                      className="object-cover z-20 cursor-pointer rounded-md w-[50%] aspect-square"
                     />
                   );
                 })}
