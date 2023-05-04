@@ -355,7 +355,7 @@ const App = (): JSX.Element => {
                     <span>
                       <Icon width={25} icon="ic:baseline-delete-forever" />
                     </span>
-                    Выбрать
+                    {isEdit ? "Отменить" : "Выбрать"}
                   </button>
                 </div>
                 <button
