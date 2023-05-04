@@ -5,6 +5,7 @@ import { Toaster, toast } from "react-hot-toast";
 import bg from "./assets/bg.jpeg";
 import { AnimatePresence, motion } from "framer-motion";
 import ImageModal from "./components/ImageModal";
+import FullScreenModal from "./components/FullScreenModal";
 
 interface BookData {
   pages: PageData[];
@@ -28,6 +29,7 @@ const App = (): JSX.Element => {
   const [isEdit, setIsEdit] = useState<boolean>(false);
   const [selectedImages, setSelectedImages] = useState<number[]>([]);
   const [selectedImage, setSelectedImage] = useState<number>(0);
+  const [fullScreen, setFullScreen] = useState<boolean>(false);
   const [data, setData] = useState<BookData>({
     pages: [
       {
@@ -166,6 +168,76 @@ const App = (): JSX.Element => {
           ]
         }
       />
+      <FullScreenModal
+        show={fullScreen}
+        onClose={() => setFullScreen(!fullScreen)}
+        data={
+          <AnimatePresence>
+            <div
+              onDragStart={(e) => dragStartHandler(e)}
+              onDragLeave={(e) => dragLeaveHandler(e)}
+              onDragOver={(e) => dragStartHandler(e)}
+              onDrop={(e) => onDropHandler(e)}
+              className={`${drag ? "bg-gray-300" : "bg-white border-[2px]"} 
+              w-full aspect-[4/3] relative flex justify-center items-center border-gray-300 transition-all`}
+            >
+              {data?.pages[selected]?.bg ? (
+                <motion.img
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  src={
+                    data?.pages[selected]?.bg?.name
+                      ? URL.createObjectURL(data?.pages[selected]?.bg)
+                      : data?.pages[selected]?.bg
+                  }
+                  className="object-cover absolute w-full h-full"
+                />
+              ) : (
+                <></>
+              )}
+              {data?.pages[selected]?.images?.map((e: any, i: number) => {
+                return (
+                  <motion.img
+                    onClick={() => setShow(true)}
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    key={i}
+                    src={URL.createObjectURL(e)}
+                    className="object-cover absolute z-20 cursor-pointer rounded-md w-[50%] aspect-auto"
+                  />
+                );
+              })}
+            </div>
+            <section className="flex gap-4 items-center justify-center mt-shorter2 lg:mt-shorter4">
+              <button
+                onClick={() => {
+                  if (selected !== 0) {
+                    setSelectedAndAddPage(selected - 1);
+                  }
+                }}
+                className="w-12 aspect-square text-black bg-gray-300 flex justify-center items-center rounded-full"
+              >
+                <Icon icon="material-symbols:arrow-back-ios-new" width={20} />
+              </button>
+              <label className="p text-blueCustom">
+                Страница: {selected + 1}
+              </label>
+              <button
+                onClick={() => setSelectedAndAddPage(selected + 1)}
+                className="w-12 aspect-square text-black bg-gray-300 flex justify-center items-center rounded-full"
+              >
+                <Icon
+                  icon="material-symbols:arrow-back-ios-new"
+                  width={20}
+                  rotate={2}
+                />
+              </button>
+            </section>
+          </AnimatePresence>
+        }
+      />
       <div className="p-shorter2 lg:p-shorter4 bg-grayCustom">
         <div className="border-[2px] border-gray-300">
           <Navbar />
@@ -286,7 +358,10 @@ const App = (): JSX.Element => {
                     Выбрать
                   </button>
                 </div>
-                <button className="flex gap-2 items-center">
+                <button
+                  onClick={() => setFullScreen(!fullScreen)}
+                  className="flex gap-2 items-center"
+                >
                   <span>
                     <Icon icon="ant-design:fullscreen-outlined" width={20} />
                   </span>
